@@ -16,10 +16,13 @@ repositories {
 
 dependencies {
     implementation 'com.github.Minestom.Minestom:Minestom:1.19.3-SNAPSHOT'
+    implementation 'org.spongepowered:configurate-hocon:4.1.2'
 }
 
 shadowJar {
     archiveBaseName.set('skycade-server-runtime')
     archiveClassifier.set('')
     archiveVersion.set(project.ext.version)
+
+    relocate 'com.typesafe', "${project.ext.package}.relocated.com.typesafe"
 }
