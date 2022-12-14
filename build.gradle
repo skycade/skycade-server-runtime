@@ -1,0 +1,25 @@
+plugins {
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
+    id 'java'
+}
+
+project.ext.version = '1.0.0-SNAPSHOT'
+project.ext.package = 'net.skycade.serverruntime'
+
+group 'net.skycade'
+version project.ext.version
+
+repositories {
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    implementation 'com.github.Minestom.Minestom:Minestom:1.19.3-SNAPSHOT'
+}
+
+shadowJar {
+    archiveBaseName.set('skycade-server-runtime')
+    archiveClassifier.set('')
+    archiveVersion.set(project.ext.version)
+}
