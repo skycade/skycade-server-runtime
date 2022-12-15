@@ -1,5 +1,7 @@
 # skycade-server-runtime
-Skycade's official custom server runtime that is the building block of all custom games produced in-house
+Skycade's official custom server runtime that is the building block of all custom games produced in-house.
+
+> :warning: This is __not__ a plugin. This is a standalone Minecraft Server runtime.
 
 -------
 
