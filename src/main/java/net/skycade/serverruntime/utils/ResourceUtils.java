@@ -14,7 +14,9 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Comparator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Stream;
+import net.skycade.serverruntime.api.ServerRuntime;
 
 /**
  * Utility class for extracting resources from the jar.
@@ -31,10 +33,11 @@ public final class ResourceUtils {
    * @throws IOException        if an I/O error occurs
    */
   public static void extractResource(String source) throws URISyntaxException, IOException {
-    final URI uri = ResourceUtils.class.getResource("/" + source).toURI();
+    final URI uri = Objects.requireNonNull(ResourceUtils.class.getResource("/" + source)).toURI();
     FileSystem fileSystem = null;
 
-    System.out.println("Extracting resource: " + source);
+    // log the resource being extracted
+    ServerRuntime.LOGGER.info("Extracting resource: " + source);
 
     // create a new filesystem if it's a jar file
     if (uri.toString().startsWith("jar:")) {
@@ -48,7 +51,6 @@ public final class ResourceUtils {
       if (Files.exists(targetPath)) {
         try (Stream<Path> pathStream = Files.walk(targetPath)) {
           pathStream.sorted(Comparator.reverseOrder()).forEach(path -> {
-            System.out.println("Deleting: " + path);
             try {
               Files.delete(path);
             } catch (IOException e) {

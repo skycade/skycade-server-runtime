@@ -1,4 +1,4 @@
-package net.skycade.serverruntime.message;
+package net.skycade.serverruntime.api.message;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -7,6 +7,7 @@ import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.title.Title;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.sound.SoundEvent;
@@ -20,6 +21,8 @@ import net.minestom.server.timer.TaskSchedule;
 public final class Messenger {
   public static final TextColor INFO_COLOR = TextColor.fromHexString("#9fb6cd");
   public static final TextColor ORANGE_COLOR = TextColor.fromHexString("#e49b0f");
+
+  private static final MiniMessage MINI_MESSAGE = MiniMessage.miniMessage();
 
   public static void info(Audience audience, String message) {
     info(audience, Component.text(message));
@@ -37,6 +40,10 @@ public final class Messenger {
   public static void warn(Audience audience, Component message) {
     audience.sendMessage(
         Component.text("! ", ORANGE_COLOR).append(message.color(NamedTextColor.GRAY)));
+  }
+
+  public static void miniMessage(Audience audience, String message) {
+    audience.sendMessage(MINI_MESSAGE.deserialize(message));
   }
 
   /**

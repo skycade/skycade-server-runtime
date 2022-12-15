@@ -1,4 +1,4 @@
-package net.skycade.serverruntime.config;
+package net.skycade.serverruntime.api.config;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
