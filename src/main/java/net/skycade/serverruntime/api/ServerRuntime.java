@@ -1,9 +1,6 @@
 package net.skycade.serverruntime.api;
 
-import com.google.gson.Gson;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
 import java.nio.file.Path;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.command.CommandManager;
@@ -11,7 +8,9 @@ import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.extras.MojangAuth;
 import net.minestom.server.extras.velocity.VelocityProxy;
 import net.minestom.server.network.ConnectionManager;
-import net.skycade.serverruntime.api.config.RuntimeConfigurationLoader;
+import net.skycade.java.api.SkycadeJavaApi;
+import net.skycade.java.api.SkycadeJavaBootstrapper;
+import net.skycade.java.api.config.ConfigurationLoader;
 import net.skycade.serverruntime.api.message.Messenger;
 import net.skycade.serverruntime.config.BasicRuntimeConfiguration;
 import org.slf4j.Logger;
@@ -41,6 +40,11 @@ public final class ServerRuntime {
    */
   private BasicRuntimeConfiguration runtimeConfiguration;
 
+  /*
+   * The Skycade Java API.
+   */
+  private SkycadeJavaApi skycadeJavaApi;
+
   /**
    * The main method that initializes the runtime code so the server can run.
    */
@@ -49,6 +53,8 @@ public final class ServerRuntime {
     if (this.minecraftServer != null) {
       throw new IllegalStateException("Server already initialized.");
     }
+
+    this.skycadeJavaApi = new SkycadeJavaBootstrapper().skycadeJavaApi();
 
     // load the configuration
     this.loadConfiguration();
@@ -73,9 +79,6 @@ public final class ServerRuntime {
   private void setUnknownCommandHandler() {
     // get the message from the configuration
     String message = this.runtimeConfiguration().messages().commandNotFound();
-    System.out.println("this.runtimeConfiguration.messages().commandNotFound() = " +
-        new Gson().toJson(this.runtimeConfiguration()));
-
 
     // set the unknown command handler
     this.commandManager().setUnknownCommandCallback((sender, command) -> {
@@ -88,9 +91,8 @@ public final class ServerRuntime {
    * Starts the server.
    */
   public void startServer() {
-    InetSocketAddress address =
-        new InetSocketAddress(this.runtimeConfiguration().server().host(),
-            this.runtimeConfiguration().server().port());
+    InetSocketAddress address = new InetSocketAddress(this.runtimeConfiguration().server().host(),
+        this.runtimeConfiguration().server().port());
 
     // start the server
     this.minecraftServer.start(address);
@@ -127,8 +129,9 @@ public final class ServerRuntime {
    * Gets and loads the runtime configuration.
    */
   private void loadConfiguration() {
-    this.runtimeConfiguration = new RuntimeConfigurationLoader<>(Path.of("runtime.conf"),
-        BasicRuntimeConfiguration.class).config();
+    this.runtimeConfiguration =
+        new ConfigurationLoader<>(Path.of("runtime.conf"), BasicRuntimeConfiguration.class,
+            this.getClass()).config();
   }
 
   /**
@@ -147,5 +150,14 @@ public final class ServerRuntime {
    */
   public BasicRuntimeConfiguration runtimeConfiguration() {
     return runtimeConfiguration;
+  }
+
+  /**
+   * Gets the Skycade Java API bootstrapper.
+   *
+   * @return the Skycade Java API bootstrapper
+   */
+  public SkycadeJavaApi skycadeJavaApi() {
+    return this.skycadeJavaApi;
   }
 }
