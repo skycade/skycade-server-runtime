@@ -1,19 +1,19 @@
 package net.skycade.serverruntime.api.event;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Consumer;
-import net.minestom.server.event.Event;
+import net.minestom.server.event.EventFilter;
 import net.minestom.server.event.EventNode;
+import net.minestom.server.event.trait.InstanceEvent;
+import net.skycade.serverruntime.api.space.GameSpace;
 
-public abstract class GameEventHandler {
+public abstract class GameEventHandler extends EventHandler<InstanceEvent> {
 
   /**
-   * The node for events.
-   * <p>
-   * This is the node that all events are registered to.
-   * It may contain other nodes, but it is the main node.
+   * The game space(s) that this event handler is for.
    */
-  private final EventNode<Event> eventNode;
+  private final List<GameSpace> forGameSpaces;
 
   /**
    * Creates a new game event handler.
@@ -24,8 +24,23 @@ public abstract class GameEventHandler {
    * @param name the event node name
    */
   public GameEventHandler(String name) {
-    this.eventNode = EventNode.all(name);
-    this.init();
+    this(name, new GameSpace[0]);
+  }
+
+  /**
+   * Creates a new game event handler.
+   * <p>
+   * This constructor initializes the event node.
+   * It is recommended to call this constructor in the constructor of the game.
+   *
+   * @param name          the event node name
+   * @param forGameSpaces the game space(s) that this event handler is for
+   */
+  public GameEventHandler(String name, GameSpace... forGameSpaces) {
+    super(EventNode.type(name, EventFilter.INSTANCE,
+        (event, instance) -> Arrays.stream(forGameSpaces)
+            .anyMatch(gameSpace -> gameSpace.getUniqueId().equals(instance.getUniqueId()))));
+    this.forGameSpaces = Arrays.asList(forGameSpaces);
   }
 
   /**
@@ -37,39 +52,11 @@ public abstract class GameEventHandler {
   protected abstract void init();
 
   /**
-   * Registers an event listener.
+   * Gets the game space(s) that this event handler is for.
    *
-   * @param eventClass the event class
-   * @param callback   the callback
+   * @return the game space(s) that this event handler is for
    */
-  protected <T extends Event> void on(Class<T> eventClass, Consumer<T> callback) {
-    this.eventNode.addListener(eventClass, callback);
-  }
-
-  /**
-   * Appends children to the event node.
-   *
-   * @param children the children to append
-   */
-  protected void append(EventNode<?>... children) {
-    Arrays.stream(children).forEach(this.eventNode::addChild);
-  }
-
-  /**
-   * Appends another game event handler to this one.
-   *
-   * @param handler the handler to append
-   */
-  protected void append(GameEventHandler handler) {
-    this.eventNode.addChild(handler.node());
-  }
-
-  /**
-   * Gets the event node.
-   *
-   * @return the event node
-   */
-  public EventNode<Event> node() {
-    return eventNode;
+  public List<GameSpace> forGameSpaces() {
+    return forGameSpaces;
   }
 }
