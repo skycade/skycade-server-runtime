@@ -52,7 +52,15 @@ public abstract class Game {
 
     // start the server
     this.runtime.startServer();
+
+    // call the on server start method
+    this.onCompleteStartup();
   }
+
+  /**
+   * When the server has completely started.
+   */
+  public abstract void onCompleteStartup();
 
   /**
    * Register the game spaces (instances).
